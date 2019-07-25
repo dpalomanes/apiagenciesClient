@@ -13,6 +13,22 @@ class Agencies extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            defaultColDef: {
+                editable: true,
+                enableRowGroup: true,
+                enablePivot: true,
+                enableValue: true,
+                sortable: true,
+                resizable: true,
+                filter: true
+            },
+            rowSelection: "multiple",
+            rowGroupPanelShow: "always",
+            pivotPanelShow: "always",
+            paginationPageSize: 10,
+            paginationNumberFormatter: function(params) {
+                return "[" + params.value.toLocaleString() + "]";
+            },
             modalTitle:"",
             modalBody: "",
             modal: false,
@@ -98,7 +114,7 @@ class Agencies extends Component {
                 {headerName: "Dirección", field: "address_line"},
                 {headerName: "Ciudad", field: "city"},
                 {headerName: "Distancia (m)", field: "distance", type:"quarterFigure"},
-                {headerName: "Fav", field: "fav", width: 50, cellRenderer: (params) => {
+                {headerName: "Fav", field: "fav", width: 70, cellRenderer: (params) => {
                         var img = document.createElement("img");
                         img.src = "https://img.icons8.com/cute-clipart/24/000000/thumb-up.png"
                         img.addEventListener('click', (e) => {
@@ -107,7 +123,7 @@ class Agencies extends Component {
                         });
                         return img;
                     }},
-                {headerName: "Unfav", field: "unfav", width: 60 , cellRenderer: (params) => {
+                {headerName: "Unfav", field: "unfav", width: 80 , cellRenderer: (params) => {
                         var img = document.createElement("img");
                         img.src = "https://img.icons8.com/cute-clipart/24/000000/thumbs-down.png"
                         img.addEventListener('click', (e) => {
@@ -218,6 +234,12 @@ class Agencies extends Component {
                 this.setState({
                     rowData: initialAgencies,
                 });
+            }).catch(response => {
+                    this.setState({
+                        modalTitle:"Consultar agencias",
+                        modalBody:"No se ha podido consultar el listado de agencias ("+response+")"
+                    })
+                this.toggle()
             });
         }
 
@@ -394,6 +416,21 @@ class Agencies extends Component {
             fontWeight: "600",
         }
 
+        var form1 = {
+            display: "flex",
+            alignItems: "center",
+            paddingLeft: "100px",
+            paddingRight: "100px",
+            paddingTop: "25px",
+        }
+
+        var form2 = {
+            width: "50%",
+            padding: "20px",
+            border: "solid 1px grey",
+            background: "lightblue"
+        }
+
 
         return (
             <div className="form">
@@ -430,67 +467,89 @@ class Agencies extends Component {
                     </Modal>
                 </div>
 
+                <div>
+                    <div style={form1}>
+                        <div style={form2}>
+                            <div>
+                                <label>Seleccione un país</label>
+                                <select style={{float:"right"}} onChange={this.onSiteChange} value={this.state.siteSelected}  >
+                                    {
+                                        this.state.sites.map((obj) => {
+                                            return <option value={obj.id}>{obj.name}</option>
+                                        })
+                                    }
+                                </select>
+                            </div>
+                            <div>
+                                <label>Seleccione un método de pago</label>
+                                <select style={{float:"right"}} onChange={this.onPaymentChange} value={this.state.paymentSelected}>
+                                    {
+                                        this.state.paymentMethods.map((obj) => {
+                                            return <option value={obj.id}>{obj.name}</option>
+                                        })
+                                    }
+                                </select>
+                            </div>
+                            <div>
+                                <label>Ubicaciones por defecto (Sólo disponible para Argentina)</label>
+                                <select style={{float:"right"}} disabled={this.state.disableDefault} onChange={this.onDefaultLocationsChange} value={this.state.defaultLocationSelected}>
+                                    {
+                                        this.state.defaultLocations.map((obj) => {
+                                            return <option value={obj.id}>{obj.name}</option>
+                                        })
+                                    }
+                                </select>
+                            </div>
+                            <div>
+                                <label>Ordenar por:</label>
+                                <select style={{float:"right"}} onChange={this.onSortCriteriaChanged} value={this.state.sortCriteriaSelected}>
+                                    {
+                                        this.state.sortCriterias.map((obj) => {
+                                            return <option value={obj.id}>{obj.name}</option>
+                                        })
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div style={form2}>
+                            <div>
+                                <label>Ubicación: click <a href="https://www.latlong.net" target="_blank">aquí</a> para obtener las coordenadas deseadas </label>
+                            </div>
+                            <div>
+                                <label>Latitud:</label>
+                                <input style={{float:"right", width:"300px"}} pattern="[0-9]*" id="latitude" type="text" value={this.state.defLatitudeSelected} onChange={this.onLatitudeChange}/>
+                            </div>
 
-                <form onSubmit={this.onFetchAgencies}>
-                <label>Seleccione un país</label>
-                <select onChange={this.onSiteChange} value={this.state.siteSelected}  >
-                    {
-                        this.state.sites.map((obj) => {
-                            return <option value={obj.id}>{obj.name}</option>
-                        })
-                    }
-                </select>
-                    <p></p>
-                <label>Seleccione un método de pago</label>
-                <select onChange={this.onPaymentChange} value={this.state.paymentSelected}>
-                    {
-                        this.state.paymentMethods.map((obj) => {
-                            return <option value={obj.id}>{obj.name}</option>
-                        })
-                    }
-                </select>
-                    <p></p>
-                <label>Ubicaciones por defecto (Sólo disponible para Argentina)</label>
-                <select disabled={this.state.disableDefault} onChange={this.onDefaultLocationsChange} value={this.state.defaultLocationSelected}>
-                    {
-                        this.state.defaultLocations.map((obj) => {
-                            return <option value={obj.id}>{obj.name}</option>
-                        })
-                    }
-                </select>
-                <p></p>
-                    <label>Ubicación: click <a href="https://www.latlong.net" target="_blank">aquí</a> para obtener las coordenadas deseadas </label>
-
-                    <p></p>
-                    <label>Latitud:</label>
-                    <input id="latitude" type="text" value={this.state.defLatitudeSelected} onChange={this.onLatitudeChange}/>
-                    <p></p>
-                    <label>Longitud:</label>
-                    <input id="longitude" type="text" value={this.state.defLongitudeSelected} onChange={this.onLongitudeChange}/>
-                    <p></p>
-                    <label>Radio:</label>
-                    <input id="radius" type="text" value={this.state.radius} onChange={this.onRadiusChange}/>
-
-                    <p></p>
-                    <label>Ordenar por:</label>
-                    <select onChange={this.onSortCriteriaChanged} value={this.state.sortCriteriaSelected}>
-                        {
-                            this.state.sortCriterias.map((obj) => {
-                                return <option value={obj.id}>{obj.name}</option>
-                            })
-                        }
-                    </select>
-                    <p></p>
-                    <Button style={{fontWeight:"600"}} value="Consultar" onClick={this.onFetchAgencies}>Consultar</Button>
-                </form>
-
-                <p></p>
-
-                <div className="ag-theme-balham" style={{ height: '200px', width: '1110px' }}>
-                    <AgGridReact
-                        columnDefs={this.state.columnDefs}
-                        rowData={this.state.rowData}>
-                    </AgGridReact>
+                            <div>
+                                <label>Longitud:</label>
+                                <input style={{float:"right", width:"300px"}} id="longitude" type="text" value={this.state.defLongitudeSelected} onChange={this.onLongitudeChange}/>
+                            </div>
+                            <div>
+                                <label>Radio:</label>
+                                <input  style={{float:"right",  width:"300px"}}id="radius" type="text" value={this.state.radius} onChange={this.onRadiusChange}/>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="ag-theme-balham" style={{ height: '200px', width: '1110px,', paddingLeft: "100px",
+                        paddingRight: "100px" }}>
+                        <Button style={{fontWeight:"600", margin: "10px"}} value="Consultar" onClick={this.onFetchAgencies}>Consultar</Button>
+                        <AgGridReact
+                            style= {{height: '300px !important'}}
+                            columnDefs={this.state.columnDefs}
+                            rowData={this.state.rowData}
+                            suppressRowClickSelection={true}
+                            groupSelectsChildren={true}
+                            debug={true}
+                            pivotPanelShow={"always"}
+                            enableRangeSelection={true}
+                            paginationAutoPageSize={true}
+                            defaultColDef={this.state.defaultColDef}
+                            pagination={true}
+                            paginationPageSize={this.state.paginationPageSize}
+                            paginationNumberFormatter={this.state.paginationNumberFormatter}
+                        >
+                        </AgGridReact>
+                    </div>
                 </div>
             </div>
         )
