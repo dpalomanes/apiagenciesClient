@@ -331,7 +331,13 @@ class Agencies extends Component {
                 favoritesModalTitle: "Listado de agencias recomendadas (" + favoriteAgencies.length +")"
             });
             this.toggleModal()
-        });
+        }).catch(response => {
+            this.setState({
+                modalTitle:"Consultar agencias",
+                modalBody:"No se ha podido consultar el listado de agencias ("+response+")"
+            })
+            this.toggle()
+        });;
     }
 
     toggle() {
@@ -424,11 +430,22 @@ class Agencies extends Component {
             paddingTop: "25px",
         }
 
-        var form2 = {
+        var formRight = {
             width: "50%",
             padding: "20px",
             border: "solid 1px grey",
-            background: "lightblue"
+            background: "lightblue",
+            borderTopRightRadius: "10px",
+            borderBottomRightRadius: "10px",
+        }
+
+        var formLeft= {
+            width: "50%",
+            padding: "20px",
+            border: "solid 1px grey",
+            background: "lightblue",
+            borderTopLeftRadius: "10px",
+            borderBottomLeftRadius: "10px",
         }
 
 
@@ -466,10 +483,9 @@ class Agencies extends Component {
                         </ModalBody>
                     </Modal>
                 </div>
-
                 <div>
                     <div style={form1}>
-                        <div style={form2}>
+                        <div style={formLeft}>
                             <div>
                                 <label>Seleccione un país</label>
                                 <select style={{float:"right"}} onChange={this.onSiteChange} value={this.state.siteSelected}  >
@@ -511,7 +527,7 @@ class Agencies extends Component {
                                 </select>
                             </div>
                         </div>
-                        <div style={form2}>
+                        <div style={formRight}>
                             <div>
                                 <label>Ubicación: click <a href="https://www.latlong.net" target="_blank">aquí</a> para obtener las coordenadas deseadas </label>
                             </div>
